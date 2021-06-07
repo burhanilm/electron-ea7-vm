@@ -1,13 +1,27 @@
 {
-  "name": "electron-vue-ea7",
+  "name": "ea7-vm",
   "version": "0.1.0",
+  "author": {
+    "name": "MonsterMac",
+    "email": "burhan.mubarak@tog.co.id"
+  },
   "private": true,
   "scripts": {
+    "start": "vue-cli-service build && electron .",
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "install": "electron-rebuild",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "dist:mac": "electron-builder --mac",
+    "postinstall": "electron-builder install-app-deps"
   },
+  "main": "main.js",
   "dependencies": {
     "core-js": "^3.6.5",
+    "electron-store": "^8.0.0",
+    "johnny-five": "^2.0.0",
+    "serialport": "^9.1.0",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
@@ -18,8 +32,38 @@
     "@vue/cli-plugin-vuex": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "@vue/compiler-sfc": "^3.0.0",
+    "electron": "^13.1.0",
+    "electron-builder": "^22.10.5",
+    "electron-rebuild": "^2.3.5",
     "node-sass": "^4.12.0",
     "sass-loader": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.ea7.vm",
+    "productName": "EA7 Vending Machine",
+    "buildDependenciesFromSource": true,
+    "npmRebuild": false,
+    "directories": {
+      "output": "release-build"
+    },
+    "win": {
+      "target": "NSIS"
+    },
+    "nsis": {
+      "allowToChangeInstallationDirectory": true,
+      "oneClick": false
+    },
+    "linux": {
+      "target": [
+        "deb",
+        "snap",
+        "rpm"
+      ],
+      "category": "Utility"
+    },
+    "deb": {},
+    "snap": {},
+    "rpm": {}
   },
   "browserslist": [
     "> 1%",

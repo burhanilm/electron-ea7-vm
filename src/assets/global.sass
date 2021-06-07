@@ -1,0 +1,114 @@
+@import vars.sass
+
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap')
+    
+*
+    margin: 0
+    padding: 0
+    border: 0
+    outline: 0
+    -webkit-box-sizing: border-box
+    -moz-box-sizing: border-box
+    box-sizing: border-box
+    text-decoration: none
+    list-style: none
+    -webkit-user-select: none
+    -moz-user-select: none
+    -ms-user-select: none
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.004)
+    text-rendering: optimizeLegibility !important
+    -webkit-font-smoothing: antialiased !important
+    -moz-osx-font-smoothing: antialiased !important
+    font-smoothing: antialiased !important
+    font-family: 'Montserrat', sans-serif
+    color: #7289da
+    -webkit-appearance: none
+    -moz-appearance: none
+    appearance: none
+    overflow: hidden
+
+input, 
+select
+    display: block
+    padding-left: 12px
+    line-height: 32px
+    // border: 2px solid #E9C46A
+    border-radius: 3px
+    background: #23272a
+    font-size: 13px
+    width: 100%
+    color: #ffffff
+    margin-bottom: 16px 
+
+    option
+        font-size: 11px
+        color: #ffffff
+        background: #2c2f33
+
+input.input-blue, 
+select.input-blue
+    background: #7289da
+
+label
+    font-size: 10px 
+    display: block
+    margin-bottom: 4px
+    font-weight: 600
+    text-transform: uppercase
+    letter-spacing: 1px
+    color: #99aab5
+
+.devider
+    width: 100%
+    height: 1px
+    background: #99aab5
+    margin-bottom: 32px
+
+.spacer
+    width: 100%
+    height: 1px
+    margin-bottom: 10px
+
+
+button,
+.btn
+    vertical-align: middle
+    display: inline-block
+    font-size: 14px
+    text-transform: uppercase
+    letter-spacing: 1px
+    background: #7289da
+    color: #ffffff
+    border-radius: 8px
+    line-height: 50px
+    font-weight: bold
+    margin: 0 10px
+    text-align: center
+    padding: 0 20px
+    cursor: pointer
+
+button.outline
+.btn.outline
+    background: none
+    border: 3px solid #7289da
+    padding: 0 17px
+    line-height: 44px
+
+
+.overlay
+    position: fixed
+    left: 0
+    top: 0
+    width: 100%
+    height: 100%
+    background: rgba(44, 47, 51, 1)
+
+    img
+        position: absolute
+        left: 50%
+        top: 50%
+        transform: translate(-50%, -50%)
+
+
+.overlay.loading
+    background: rgba(44, 47, 51, 0.7)

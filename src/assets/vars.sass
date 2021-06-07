@@ -1,0 +1,49 @@
+$orange1 : #DDC355
+$orange2 : #B9822C
+$yellow1 : #F9D11B
+$yellow2 : #F7AC1B
+$red : #FE4C48
+
+$dark-grey: #292929
+$grey: #707070
+
+$grey-light: #888
+
+=radius($size)
+    border-radius: $size
+
+=shadow($p1, $p2, $p3, $opac)
+    box-shadow: $p1 $p2 $p3 rgba(0,0,0,$opac)
+
+=backgrad($arah,$color1,$color2)
+    background: linear-gradient($arah, $color1, $color2)
+
+%center-fixed
+    position: fixed
+    transform: translate(-50%,-50%)
+    top: 50%
+    left: 50%
+
+%full-fixed
+    position: fixed
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
+%center-absolute
+    position: absolute
+    transform: translate(-50%,-50%)
+    top: 50%
+    left: 50%
+
+%full-absolute
+    position: absolute
+    top: 0
+    left: 0
+    right: 0
+    bottom: 0
+
+%inline-middle
+    display: inline-block
+    vertical-align: middle
