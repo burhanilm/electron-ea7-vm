@@ -27,6 +27,18 @@ module.exports = ({serialPort, slotConfig = []}) => {
         }
     })
 
+    mc.on('close', () => {
+        main.emit('error', 'Board closed')
+    })
+
+    mc.on('fail', (e) => {
+        main.emit('error', e)
+    })
+
+    mc.on('error', (e) => {
+        main.emit('error', e)
+    })
+
     return main
 
 }

@@ -1,3 +1,5 @@
+const log = require('electron-log')
+
 module.exports = ({
     five,
     dropDetection,
@@ -37,7 +39,7 @@ module.exports = ({
     const RunMotor = (m) => {
         return new Promise((resolve, reject) => {
 
-            console.log(">> Triggering motor " + m)
+            log.info(">> Triggering motor " + m)
 
             if (_dropDetection) {
                 let err_count = 0
@@ -46,13 +48,13 @@ module.exports = ({
                     const val = sensor.value
                     if (!val) {
                         clearInterval(readDetector)
-                        console.log("Drop success " + m)
+                        log.info("Drop success " + m)
                         return resolve(true)
                     } else {
                         err_count++
                         if (err_count >= 120) {
                             clearInterval(readDetector)
-                            console.log("Drop error " + m)
+                            log.info("Drop error " + m)
                             return resolve(false)
                         }
                     }
@@ -63,7 +65,7 @@ module.exports = ({
 
             mcp[mtr[0]].digitalWrite(parseInt(mtr[1]) - 1, 1)
             setTimeout(() => {
-                console.log(">> Auto run " + m)
+                log.info(">> Auto run " + m)
                 mcp[mtr[0]].digitalWrite(parseInt(mtr[1]) - 1, 0)
 
                 if (!_dropDetection) {

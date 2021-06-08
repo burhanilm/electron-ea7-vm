@@ -1,14 +1,52 @@
-const { app, ipcMain, globalShortcut, BrowserWindow} = require('electron')
+const {
+    app,
+    ipcMain,
+    globalShortcut,
+    BrowserWindow
+} = require('electron')
 const Store = require('electron-store');
+const log = require('electron-log');
+const sudo = require('sudo-prompt');
+const AutoLaunch = require('auto-launch');
+const path = require('path')
+const url = require('url')
+const Board = require('./board/init')
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const path = require('path')
-const url = require('url')
+if (process.platform === 'linux') {
 
-const Board = require('./board/init')
+    sudo.exec('id -nG "$USER" | grep -c "dialout"', {
+        name: 'check user in a group'
+    }, (error, stdout, stderr) => {
+        if (!parseInt(stdout)) {
+            sudo.exec('usermod -a -G dialout $USER', {
+                name: 'add user to dialout group'
+            }, (error, stdout, stderr) => {
+                log.info('User set to dialout')
+            })
+        }
+    })
+}
 
-let mainWindow 
+let autoLaunch = new AutoLaunch({
+    name: 'EA7 Vending Machine'
+});
+
+autoLaunch.enable();
+
+autoLaunch.isEnabled()
+.then(function(isEnabled){
+    if(isEnabled){
+        return;
+    }
+    autoLaunch.enable();
+})
+.catch(function(err){
+    log.error(err)
+});
+
+let mainWindow
 let appPreferences = {
     serialPort: "",
     slotConfigRaw: (() => {
@@ -29,14 +67,14 @@ let appPreferences = {
 }
 let appPreferencesReady = false
 let board
-let boardReady = false
+let boardReady = 0
 
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1080,
         height: 1920,
         frame: false,
-        // kiosk: true,
+        kiosk: true,
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false,
@@ -60,7 +98,6 @@ function createWindow() {
 app.allowRendererProcessReuse = false
 
 app.on('ready', () => {
-
     createWindow()
     initPreferences()
     initBoard()
@@ -69,6 +106,8 @@ app.on('ready', () => {
         app.relaunch()
         app.quit()
     })
+
+    log.info('App ready')
 })
 
 app.on('window-all-closed', function() {
@@ -81,25 +120,25 @@ app.on('activate', function() {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
 })
 
-app.on('browser-window-focus', function () {
+app.on('browser-window-focus', function() {
     globalShortcut.register('CommandOrControl+F1', () => {
         mainWindow.webContents.send('goto', 'Configuration')
     })
     globalShortcut.register("CommandOrControl+R", () => {
-        console.log("CommandOrControl+R is pressed: Shortcut Disabled");
+        return
     });
     globalShortcut.register("CommandOrControl+Shift+R", () => {
-        console.log("CommandOrControl+Shift+R is pressed: Shortcut Disabled");
+        return
     });
     globalShortcut.register("F5", () => {
-        console.log("F5 is pressed: Shortcut Disabled");
+        return
     });
     globalShortcut.register("F11", () => {
-        console.log("F11 is pressed: Shortcut Disabled");
+        return
     });
 });
 
-app.on('browser-window-blur', function () {
+app.on('browser-window-blur', function() {
     globalShortcut.unregister('CommandOrControl+F1')
     globalShortcut.unregister('CommandOrControl+R');
     globalShortcut.unregister('CommandOrControl+Shift+R');
@@ -136,28 +175,30 @@ function initPreferences() {
             default: 57600
         }
     }
-    
-    const store = new Store({schema: prefSchema})
-    
-    function fetchPreferences () {
-    
+
+    const store = new Store({
+        schema: prefSchema
+    })
+
+    function fetchPreferences() {
+
         const serialPortPref = store.get('serialPort')
         appPreferences.serialPort = (serialPortPref === undefined) ? "" : serialPortPref
         appPreferences.row = store.get('row')
         appPreferences.baudRate = store.get('baudRate')
-    
+
         try {
-            appPreferences.slotConfigRaw = JSON.parse(store.get('slotConfigRaw')) 
+            appPreferences.slotConfigRaw = JSON.parse(store.get('slotConfigRaw'))
             appPreferences.col = JSON.parse(store.get('col'))
         } catch (e) {}
-    
+
         appPreferences.slotConfig = []
         for (let i = 0; i < appPreferences.slotConfigRaw.length; i++) {
             for (let j = 0; j < appPreferences.slotConfigRaw[i].length; j++) {
                 if (appPreferences.slotConfigRaw[i][j] !== "") appPreferences.slotConfig.push(appPreferences.slotConfigRaw[i][j])
             }
         }
-        
+
         if (!appPreferencesReady) {
             appPreferencesReady = true
             mainWindow.webContents.send('appPreferences:ready', appPreferences)
@@ -165,15 +206,15 @@ function initPreferences() {
 
         return appPreferences
     }
-    
+
     ipcMain.handle('appPreferences:fetch', async (event, key) => {
         return (appPreferencesReady) ? fetchPreferences() : false
     })
-    
+
     ipcMain.on('appPreferences:set:serialPort', (event, val) => {
         store.set('serialPort', val)
     })
-    
+
     ipcMain.on('appPreferences:set:slotConfigRaw', (event, val) => {
         store.set('slotConfigRaw', val)
     })
@@ -181,46 +222,47 @@ function initPreferences() {
     ipcMain.on('appPreferences:set:baudRate', (event, val) => {
         store.set('baudRate', val)
     })
-    
+
     fetchPreferences()
 
 }
 
-function initBoard () {
+function initBoard() {
     if (appPreferences.serialPort === '' || appPreferences.slotConfig.length === 0) {
-        console.log('config')
+
     } else {
         const b = Board({
             serialPort: appPreferences.serialPort,
             slotConfig: appPreferences.slotConfig
         })
-        
+
         b.on('ready', (__board) => {
             board = __board
-    
+
             ipcMain.handle('board:motor:trigger', async (event, val) => {
                 try {
                     await board.Motor.Trigger(val)
                     return true
-                } catch(e) {
-                    console.log(e)
+                } catch (e) {
+                    log.error(e)
                     return false
                 }
             })
-    
-            boardReady = true
-            mainWindow.webContents.send('board:ready', true)
-            
+
+            boardReady = 1
+            mainWindow.webContents.send('board:ready', 1)
+
         })
-    
+
         b.on('error', (e) => {
-            console.log(e)
-            mainWindow.webContents.send('board:error', e)
+            log.error(e)
+            boardReady = 2
+            mainWindow.webContents.send('board:ready', 2)
         })
     }
-    
+
     ipcMain.handle('board:status', async (event, val) => {
         return boardReady
     })
-    
+
 }
