@@ -1,9 +1,14 @@
 <template>
   <router-view />
   <transition name="fade">
-      <div class="overlay" v-if="!$store.state.appReady">
-          <img src="./assets/figget.gif" width="128" alt="">
-      </div>
+    <div class="overlay" v-if="!$store.state.appReady && $store.state.boardReady != 2">
+        <img src="./assets/figget.gif" width="128" alt="">
+    </div>
+  </transition>
+  <transition name="fade">
+    <div class="overlay" v-if="$store.state.boardReady == 2 && $route.name != 'Configuration'">
+        <img src="./assets/cancel.png" width="128" alt="">
+    </div>
   </transition>
 </template>
 
@@ -27,12 +32,13 @@ export default {
       if (pref.serialPort === '' || pref.slotConfig.length === 0) this.$router.replace({name: 'Configuration'})
     }
     
-    if (!(await ipcRenderer.invoke('board:status', true))) {
+    const boardStatus = await ipcRenderer.invoke('board:status', true)
+    if (boardStatus == 0) {
       ipcRenderer.on('board:ready', (event, arg) => {
-        this.$store.commit('SET_BOARD_READY')
+        this.$store.commit('SET_BOARD_READY', arg)
       })
     } else {
-      this.$store.commit('SET_BOARD_READY')
+      this.$store.commit('SET_BOARD_READY', boardStatus)
     }
 
     ipcRenderer.on('goto', (event, arg) => {
@@ -152,13 +158,21 @@ export default {
     background: white
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.06)
 
-.fade-enter-active,
-.fade-leave-active
-  transition: opacity 0.5s ease
 
-.fade-enter-from,
-.fade-leave-to 
-  opacity: 0
+.logo
+  position: fixed
+  bottom: 40px
+  left: 50%
+  transform: translateX(-50%)
+  opacity: 0.3
+
+// .fade-enter-active,
+// .fade-leave-active
+//   transition: opacity 0.5s ease
+
+// .fade-enter-from,
+// .fade-leave-to 
+//   opacity: 0
 
 
 .fade-enter-active

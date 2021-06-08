@@ -75,6 +75,7 @@
             </form>
         </div>
         
+        <img class="logo" src="../assets/logo.png" height="35" alt="">
         
         <transition name="fade">
             <div class="overlay" v-if="loading">

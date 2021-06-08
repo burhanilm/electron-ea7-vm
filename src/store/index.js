@@ -29,7 +29,7 @@ export default createStore({
         appPreferences: appPreferencesDefault(),
         appPreferencesDefault: JSON.stringify(appPreferencesDefault()),
         appPreferencesReady: false,
-        boardReady: false
+        boardReady: 0
     },
     mutations: {
         SET_PREFERENCES(state, data) {
@@ -39,9 +39,9 @@ export default createStore({
             state.appPreferencesReady = true
             if (state.boardReady) state.appReady = true
         },
-        SET_BOARD_READY(state) {
-            state.boardReady = true
-            if (state.appPreferencesReady) state.appReady = true
+        SET_BOARD_READY(state, arg) {
+            state.boardReady = arg
+            if (arg === 1 && state.appPreferencesReady) state.appReady = true
         },
         SET_APPREADY(state) {
             state.appReady = true
