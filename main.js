@@ -184,12 +184,10 @@ function initPreferences() {
 
         const serialPortPref = store.get('serialPort')
         appPreferences.serialPort = (serialPortPref === undefined) ? "" : serialPortPref
-        appPreferences.row = store.get('row')
         appPreferences.baudRate = store.get('baudRate')
 
         try {
             appPreferences.slotConfigRaw = JSON.parse(store.get('slotConfigRaw'))
-            appPreferences.col = JSON.parse(store.get('col'))
         } catch (e) {}
 
         appPreferences.slotConfig = []

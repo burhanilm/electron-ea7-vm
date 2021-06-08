@@ -1,10 +1,14 @@
 {
   "name": "ea7-vending-machine",
-  "version": "0.1.3",
+  "version": "0.1.4-alpha",
   "description": "EA7 Vending Machine Project Software",
   "author": {
     "name": "MonsterMac",
     "email": "burhan@monstermac.co.id"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/burhanilm/electron-ea7-vm.git"
   },
   "homepage": "monstermac.co.id",
   "private": true,
@@ -16,6 +20,7 @@
     "dist:win": "electron-builder --win",
     "dist:linux": "electron-builder --linux",
     "dist:mac": "electron-builder --mac",
+    "release": "electron-builder",
     "postinstall": "electron-builder install-app-deps"
   },
   "main": "main.js",
@@ -62,7 +67,8 @@
       "target": [
         "deb"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "publish": ["github"]
     },
     "deb": {}
   },
